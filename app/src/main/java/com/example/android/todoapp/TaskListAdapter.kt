@@ -46,7 +46,11 @@ class TaskListAdapter(private val mTaskList: LinkedList<Task>, val onClickDelete
             }
 
         }
-        fun bind(task : Task){ mTaskView?.text = task.content}
+        fun bind(task : Task){
+            mTaskView?.text = task.content
+            mTaskView?.strikeThrough = task.completed
+            itemView.close?.isChecked = task.completed
+        }
 
         private var TextView.strikeThrough
             get() = paintFlags and Paint.STRIKE_THRU_TEXT_FLAG > 0

@@ -5,6 +5,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Deferred
 import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -20,15 +21,15 @@ interface TodoApiService {
     fun createTasks(@Body task: Task): Deferred<Task>
 
     @DELETE("tasks/{id}")
-    fun deleteTask(@Path("id") id: String): Deferred<Response<Unit>>
+    fun deleteTask(@Path("id") id: String): Deferred<Response<ResponseBody>>
 
-    @GET("tasks/{id}/close")
+    @POST("tasks/{id}/close")
 //    @Headers("Content-Type: application/json")
-    fun checkedTasks(@Path("id") id: String): Deferred<Response<Unit>>
+    fun checkedTasks(@Path("id") id: String): Deferred<Response<ResponseBody>>
 
-    @GET("tasks/{id}/reopen")
+    @POST("tasks/{id}/reopen")
 //    @Headers("Content-Type: application/json")
-    fun unCheckedTasks(@Path("id") id: String): Deferred<Response<Unit>>
+    fun unCheckedTasks(@Path("id") id: String): Deferred<Response<ResponseBody>>
 }
 
 

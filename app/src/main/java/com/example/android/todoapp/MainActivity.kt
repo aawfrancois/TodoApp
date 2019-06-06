@@ -2,18 +2,14 @@ package com.example.android.todoapp
 
 import android.os.Bundle
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.EditText
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.android.todoapp.network.Task
 import com.example.android.todoapp.network.TodoApiFactory
-import com.example.android.todoapp.network.TodoApiService
-import com.google.android.material.snackbar.Snackbar
-
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.coroutines.CoroutineScope
@@ -29,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     // Create coroutine Job and Scope
     private var viewModelJob = Job()
     private val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main )
+    private val todoApiService = TodoApiFactory.retrofitService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,7 +58,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun getTasks() {
         coroutineScope.launch {
-            val getTasksDeferred = TodoApiFactory.retrofitService.getTasks().await()
+            val getTasksDeferred = todoApiService.getTasks().await()
             Log.i("task", "\uD83D\uDD25\uD83D\uDD25 RESULT => $getTasksDeferred")
             mTaskList.clear()
             mTaskList.addAll(getTasksDeferred)
@@ -71,7 +68,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun createTasks(str: String) {
         coroutineScope.launch {
-            val getTasksDeferred = TodoApiFactory.retrofitService.createTasks(Task("",str, false)).await()
+            val getTasksDeferred = todoApiService.createTasks(Task("",str, false)).await()
             Log.i("🚨 task", "\uD83D\uDD25\uD83D\uDD25 RESULT => $getTasksDeferred")
             getTasks()
         }
@@ -80,7 +77,7 @@ class MainActivity : AppCompatActivity() {
     private fun onDeleteItem(position: Int) {
         lifecycleScope.launch {
             val task = mTaskList[position]
-            val res = TodoApiFactory.retrofitService.deleteTask(task.id).await()
+            val res = todoApiService.deleteTask(task.id).await()
             if (res.isSuccessful) {
                 mTaskList.remove(task)
                 recyclerView.adapter?.notifyItemRemoved(position)
@@ -91,8 +88,8 @@ class MainActivity : AppCompatActivity() {
     private fun onCloseItem(position: Int) {
         lifecycleScope.launch {
             val task = mTaskList[position]
-
-            TodoApiFactory.retrofitService.checkedTasks(task.id).await()
+            val res = todoApiService.checkedTasks(task.id).await()
+            Log.i("🚨 close", "\uD83D\uDD25\uD83D\uDD25 RESULT => $res")
         }
 
     }
@@ -100,7 +97,8 @@ class MainActivity : AppCompatActivity() {
     private fun onReopenItem(position: Int){
         lifecycleScope.launch {
             val task = mTaskList[position]
-            val res = TodoApiFactory.retrofitService.unCheckedTasks(task.id).await()
+            val res = todoApiService.unCheckedTasks(task.id).await()
+            Log.i("🚨 reopen", "\uD83D\uDD25\uD83D\uDD25 RESULT => $res")
         }
     }
 
